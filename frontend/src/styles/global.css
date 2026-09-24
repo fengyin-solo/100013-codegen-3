@@ -33,3 +33,31 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+.reason-cell { max-width: 280px; color: var(--muted); line-height: 1.5; }
+
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; white-space: nowrap; }
+.badge-ok { background: #e7f6ec; color: #1a7f37; border: 1px solid #b7e0c4; }
+.badge-block { background: #fdecec; color: #b42318; border: 1px solid #f3c2c2; }
+
+.link-disabled { color: #9aa6b2; cursor: not-allowed; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.modal-mask { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); display: flex; align-items: center; justify-content: center; z-index: 20; padding: 24px; }
+.modal { background: #fff; border-radius: 10px; width: min(640px, 100%); max-height: 86vh; overflow: auto; padding: 18px 20px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.modal-head h3 { margin: 0; font-size: 16px; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.detail-item { display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+.detail-item-wide { grid-column: 1 / -1; }
+.detail-label { font-size: 12px; color: var(--muted); }
+.detail-value { font-size: 13px; word-break: break-all; }
+.detail-tip { font-size: 12px; color: var(--muted); margin: 12px 0 0; line-height: 1.6; }
+
+.form-block { display: block; margin-top: 12px; }
+.form-block .detail-label { margin-bottom: 4px; }
+.form-textarea { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; resize: vertical; }
+.form-textarea:focus { outline: none; border-color: var(--brand); }
+
+.filter-item select { border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; font-size: 13px; background: #fff; }

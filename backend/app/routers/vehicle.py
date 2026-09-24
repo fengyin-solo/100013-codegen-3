@@ -20,13 +20,20 @@ STATUSES = ["可用", "出车中", "维修中", "已停用"]
 def list_entries(
     keyword: str | None = Query(default=None, description="按车牌号码检索"),
     status: str | None = Query(default=None, description="可用、出车中、维修中、已停用"),
+    dispatchable: str | None = Query(default=None, description="出车准用条件：true=可出车，false=限制出车"),
     page: int = 1,
     size: int = 20,
 ) -> PageResult[dict]:
-    """按车牌号码与状态过滤冷藏车管理列表；没有数据时返回空页，不报错。"""
+    """按车牌号码、状态与出车准用条件过滤冷藏车列表；没有数据时返回空页，不报错。
+
+    每条记录都会带上「准用状态/准用说明」，说明由系统参数里的容积范围、
+    制冷机组白名单与车辆停用状态合并判定。
+    """
     if size > 200:
         raise HTTPException(status_code=400, detail="每页最多 200 条，请缩小分页范围")
-    items, total = service.list_entries(keyword=keyword, status=status, page=page, size=size)
+    items, total = service.list_entries(
+        keyword=keyword, status=status, dispatchable=dispatchable, page=page, size=size
+    )
     return PageResult(items=items, total=total, page=page, size=size)
 
 

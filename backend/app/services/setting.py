@@ -1,6 +1,7 @@
-"""系统设置业务规则：状态流转、字段校验与筛选口径都收在这里。"""
+"""系统设置业务规则：状态流转、字段校验、筛选口径与参数值更新都收在这里。"""
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from app.store import store
@@ -10,6 +11,12 @@ REQUIRED_FIELDS = ["参数编码", "参数名称", "参数值"]
 STATUS_ORDER = ["已生效", "待生效", "已回滚"]
 ACTION_RULES = {"修改参数": "待生效", "回滚参数": "已回滚", "生效参数": "已生效"}
 NEGATIVE_ACTIONS = ["回滚参数"]
+
+# 冷藏车准用规则参数：值必须是对应结构的 JSON，调整后立刻被车辆判定读取。
+JSON_PARAM_SHAPES = {
+    "VEHICLE_VOLUME_RULES": dict,
+    "VEHICLE_UNIT_WHITELIST": list,
+}
 
 
 class SettingService:
@@ -59,3 +66,30 @@ class SettingService:
         entry["pending"] = target != STATUS_ORDER[-1]
         entry["abnormal"] = action in NEGATIVE_ACTIONS
         return entry, f"系统参数已{action}"
+
+    def update_value(self, entry_id: int, value: Any) -> tuple[dict[str, Any] | None, str]:
+        """更新系统参数值。
+
+        参数保存在内存仓库里，服务不重启就一直生效；冷藏车准用规则每次判定都
+        实时读取，因此调整后刷新车辆列表即可看到新结果，无需重启。
+        """
+        entry = store.find(MODULE, entry_id)
+        if entry is None:
+            return None, f"系统参数 {entry_id} 不存在或已归档"
+        text = str(value if value is not None else "").strip()
+        if not text:
+            return None, "参数值不能为空"
+
+        code = str(entry.get("参数编码") or "")
+        expected_shape = JSON_PARAM_SHAPES.get(code)
+        if expected_shape is not None:
+            try:
+                parsed = json.loads(text)
+            except (TypeError, ValueError):
+                return None, f"参数「{code}」的值必须是合法 JSON"
+            if not isinstance(parsed, expected_shape):
+                shape_name = "对象" if expected_shape is dict else "数组"
+                return None, f"参数「{code}」的值必须是 JSON {shape_name}"
+
+        entry["参数值"] = text
+        return entry, f"系统参数「{entry.get('参数名称') or code}」已更新并生效"
